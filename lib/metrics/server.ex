@@ -1,4 +1,4 @@
-defmodule Metrics.Server do
+defmodule Metrics.ServerStub do
   @moduledoc """
   Client implementation to the main Metric server
   """
@@ -7,6 +7,6 @@ defmodule Metrics.Server do
   A new web client is online
   """
   def client_online() do
-    GenServer.cast({:global, {:grapvine, :metrics}}, {:client, :online, self()})
+    GenServer.cast({:global, {:grapevine, :metrics}}, {:client, :online, self()})
   end
 end
