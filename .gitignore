@@ -25,3 +25,5 @@ grapevine-*.tar
 /deploy/hosts_*
 /config/dev.exs
 /tmp/*.tar.gz
+/env.sh
+/scp.sh
