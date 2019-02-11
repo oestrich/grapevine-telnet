@@ -11,7 +11,7 @@ defmodule Telnet.WebClient do
 
   @behaviour Client
 
-  @idle_time 30_000
+  @idle_time 60_000
 
   def recv(pid, message) do
     send(pid, {:recv, message})
