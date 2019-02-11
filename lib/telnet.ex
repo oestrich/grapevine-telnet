@@ -7,6 +7,6 @@ defmodule Telnet do
   Get the running version of the client
   """
   def version() do
-    to_string(elem(Enum.find(:application.loaded_applications(), &(elem(&1, 0) == :telnet)), 2))
+    "1.0.0"
   end
 end

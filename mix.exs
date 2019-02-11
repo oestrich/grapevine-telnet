@@ -24,6 +24,7 @@ defmodule Telnet.MixProject do
     [
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.1"},
+      {:libcluster, "~> 3.0"},
       {:telemetry, "~> 0.3"},
     ]
   end
