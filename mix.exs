@@ -4,7 +4,7 @@ defmodule Telnet.MixProject do
   def project do
     [
       app: :telnet,
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -23,6 +23,7 @@ defmodule Telnet.MixProject do
   defp deps do
     [
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:distillery, "~> 2.0", runtime: false},
       {:jason, "~> 1.1"},
       {:libcluster, "~> 3.0"},
       {:telemetry, "~> 0.3"},
