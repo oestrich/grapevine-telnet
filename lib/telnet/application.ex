@@ -9,6 +9,11 @@ defmodule Telnet.Application do
       {Telnet.ClientSupervisor, [name: {:global, Telnet.ClientSupervisor}]},
     ]
 
+    report_errors = Application.get_env(:telnet, :errors)[:report]
+    if report_errors do
+      {:ok, _} = Logger.add_backend(Sentry.LoggerBackend)
+    end
+
     children = Enum.reject(children, &is_nil/1)
     opts = [strategy: :one_for_one, name: Telnet.Supervisor]
     Supervisor.start_link(children, opts)

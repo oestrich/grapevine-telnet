@@ -26,6 +26,7 @@ defmodule Telnet.MixProject do
       {:distillery, "~> 2.0", runtime: false},
       {:jason, "~> 1.1"},
       {:libcluster, "~> 3.0"},
+      {:sentry, "~> 7.0"},
       {:telemetry, "~> 0.3"},
     ]
   end
