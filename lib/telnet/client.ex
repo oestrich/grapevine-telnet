@@ -89,7 +89,7 @@ defmodule Telnet.Client do
 
     state = module.init(state, opts)
 
-    :telemetry.execute([:grapevine, :telnet, :start], 1, state)
+    :telemetry.execute([:telnet, :start], %{}, state)
 
     {:ok, state, {:continue, :connect}}
   end
@@ -99,14 +99,14 @@ defmodule Telnet.Client do
 
     case :gen_tcp.connect(host, state.port, [:binary, {:packet, :raw}]) do
       {:ok, socket} ->
-        :telemetry.execute([:grapevine, :telnet, :connection, :connected], 1, state)
+        :telemetry.execute([:telnet, :connection, :connected], %{}, state)
         state.module.connected(state)
 
         {:noreply, Map.put(state, :socket, socket)}
 
       {:error, error} ->
         state.module.connection_failed(state, error)
-        :telemetry.execute([:grapevine, :telnet, :connection, :failed], 1, %{error: error})
+        :telemetry.execute([:telnet, :connection, :failed], %{}, %{error: error})
 
         {:stop, :normal, state}
     end
@@ -120,7 +120,7 @@ defmodule Telnet.Client do
         metadata = Keyword.get(opts, :metadata, %{})
         metadata = maybe_add_game_to_metadata(state, metadata)
 
-        :telemetry.execute([:grapevine, :telnet] ++ opts[:telemetry], 1, metadata)
+        :telemetry.execute([:telnet] ++ opts[:telemetry], %{}, metadata)
 
       false ->
         :ok
@@ -208,6 +208,11 @@ defmodule Telnet.Client do
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
+  defp process_option(state, option = {:do, :gmcp}) do
+    socket_send(<<255, 251, 201>>, telemetry: [:gmcp, :sent])
+    {:noreply, %{state | processed: [option | state.processed]}}
+  end
+
   defp process_option(state, option = {:do, byte}) when is_integer(byte) do
     socket_send(<<255, 252, byte>>, telemetry: [:dont], metadata: %{byte: byte})
     {:noreply, %{state | processed: [option | state.processed]}}
@@ -264,7 +269,7 @@ defmodule Telnet.Client do
 
   defp process_option(state, option = {:gmcp, _, _}) do
     metadata = maybe_add_game_to_metadata(state, %{})
-    :telemetry.execute([:grapevine, :telnet, :gmcp, :received], 1, metadata)
+    :telemetry.execute([:telnet, :gmcp, :received], %{}, metadata)
 
     state.module.process_option(state, option)
   end

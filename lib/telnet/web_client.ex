@@ -44,7 +44,7 @@ defmodule Telnet.WebClient do
     Process.flag(:trap_exit, true)
     Process.link(channel_pid)
 
-    Metrics.ServerStub.client_online()
+    Telnet.Metrics.Server.client_online()
 
     state
     |> Map.put(:game, Keyword.get(opts, :game))
@@ -93,6 +93,13 @@ defmodule Telnet.WebClient do
 
         {:noreply, state}
     end
+  end
+
+  def process_option(state = %{features: %{gmcp: false}}, {:gmcp, message, data}) do
+    IO.inspect message
+    IO.inspect data
+
+    {:noreply, state}
   end
 
   # the game is handling echos, aka password prompt
