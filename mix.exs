@@ -30,8 +30,8 @@ defmodule Telnet.MixProject do
       {:prometheus_ex, "~> 3.0"},
       {:prometheus_plugs, "~> 1.1.1"},
       {:sentry, "~> 7.0"},
-      {:telemetry, "~> 0.3"},
-      {:telemetry_poller, "~> 0.3.0"},
+      {:telemetry, "~> 0.3.0"},
+      {:telemetry_poller, "~> 0.2.0"},
     ]
   end
 end
