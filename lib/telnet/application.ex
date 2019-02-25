@@ -44,7 +44,7 @@ defmodule Telnet.Application do
   end
 
   defp metrics_plug() do
-    if @metrics[:server] do
+    if Keyword.get(@metrics, :server, true) do
       Plug.Cowboy.child_spec(scheme: :http, plug: Telnet.Endpoint, options: @metrics[:host])
     end
   end
