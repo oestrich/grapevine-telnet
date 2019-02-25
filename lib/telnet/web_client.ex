@@ -48,6 +48,7 @@ defmodule Telnet.WebClient do
 
     state
     |> Map.put(:game, Keyword.get(opts, :game))
+    |> Map.put(:type, Keyword.get(opts, :type))
     |> Map.put(:host, Keyword.get(opts, :host))
     |> Map.put(:port, Keyword.get(opts, :port))
     |> Map.put(:channel_pid, channel_pid)
@@ -140,8 +141,7 @@ defmodule Telnet.WebClient do
 
   @impl true
   def handle_info({:recv, message}, state) do
-    :gen_tcp.send(state.socket, message)
-
+    Client.socket_send(message, [])
     {:noreply, state}
   end
 

@@ -72,8 +72,13 @@ defmodule Telnet.Client do
     GenServer.start_link(__MODULE__, opts, server_opts)
   end
 
-  defp socket_send(iac, opts) do
-    GenServer.cast(self(), {:send, iac, opts})
+  @doc """
+  Send data back to the server through the socket
+
+  Note: This uses self()
+  """
+  def socket_send(data, opts) do
+    GenServer.cast(self(), {:send, data, opts})
   end
 
   def init(opts) do
@@ -95,9 +100,7 @@ defmodule Telnet.Client do
   end
 
   def handle_continue(:connect, state) do
-    host = String.to_charlist(state.host)
-
-    case :gen_tcp.connect(host, state.port, [:binary, {:packet, :raw}]) do
+    case connect(state) do
       {:ok, socket} ->
         :telemetry.execute([:telnet, :connection, :connected], 1, state)
         state.module.connected(state)
@@ -113,7 +116,13 @@ defmodule Telnet.Client do
   end
 
   def handle_cast({:send, iac, opts}, state) do
-    :gen_tcp.send(state.socket, iac)
+    case state.type do
+      "telnet" ->
+        :gen_tcp.send(state.socket, iac)
+
+      "secure telnet" ->
+        :ssl.send(state.socket, iac)
+    end
 
     case Keyword.has_key?(opts, :telemetry) do
       true ->
@@ -130,17 +139,19 @@ defmodule Telnet.Client do
   end
 
   def handle_info({:tcp, _port, data}, state) do
-    {options, string, buffer} = Options.parse(state.buffer <> data)
-    state = %{state | buffer: buffer}
+    process_data(data, state)
+  end
 
-    Enum.each(options, fn option ->
-      send(self(), {:process, option})
-    end)
-
-    state.module.receive(state, string)
+  def handle_info({:ssl, _socket, data}, state) do
+    process_data(data, state)
   end
 
   def handle_info({:tcp_closed, _port}, state) do
+    state.module.disconnected(state)
+    {:stop, :normal, state}
+  end
+
+  def handle_info({:ssl_closed, _socket}, state) do
     state.module.disconnected(state)
     {:stop, :normal, state}
   end
@@ -157,6 +168,29 @@ defmodule Telnet.Client do
 
   def handle_info(message, state) do
     state.module.handle_info(message, state)
+  end
+
+  defp connect(state) do
+    host = String.to_charlist(state.host)
+
+    case state.type do
+      "telnet" ->
+        :gen_tcp.connect(host, state.port, [:binary, {:packet, :raw}])
+
+      "secure telnet" ->
+        :ssl.connect(host, state.port, [:binary])
+    end
+  end
+
+  defp process_data(data, state) do
+    {options, string, buffer} = Options.parse(state.buffer <> data)
+    state = %{state | buffer: buffer}
+
+    Enum.each(options, fn option ->
+      send(self(), {:process, option})
+    end)
+
+    state.module.receive(state, string)
   end
 
   defp maybe_add_game_to_metadata(%{game: game}, metadata) when game != nil do
