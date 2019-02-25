@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :telnet, :metrics, server: true
+config :telnet, :metrics, server: false
