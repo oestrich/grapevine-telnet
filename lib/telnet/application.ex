@@ -3,6 +3,8 @@ defmodule Telnet.Application do
 
   use Application
 
+  @metrics Application.get_env(:telnet, :metrics)
+
   def start(_type, _args) do
     children = [
       cluster_supervisor(),
@@ -42,6 +44,8 @@ defmodule Telnet.Application do
   end
 
   defp metrics_plug() do
-    Plug.Cowboy.child_spec(scheme: :http, plug: Telnet.Endpoint, options: [port: 4100])
+    if @metrics[:enabled] do
+      Plug.Cowboy.child_spec(scheme: :http, plug: Telnet.Endpoint, options: @metrics[:host])
+    end
   end
 end
