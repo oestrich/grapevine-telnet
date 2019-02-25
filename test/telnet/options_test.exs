@@ -46,6 +46,7 @@ defmodule Telnet.OptionsTest do
 
     test "handles midstream sub negotiation" do
       assert {[], <<>>, <<255, 250, 70, 1>>} = Options.parse(<<255, 250, 70, 1>>)
+      assert {[], "string", <<255, 250, 70, 1>>} = Options.parse("string" <> <<255, 250, 70, 1>>)
     end
   end
 

@@ -91,7 +91,7 @@ defmodule Telnet.Options do
   def options(<<@iac, @sb, data::binary>>, current, stack, leftover) do
     case parse_sub_negotiation(<<@iac, @sb>> <> data) do
       :error ->
-        options(data, current <> <<@iac, @sb>>, stack, leftover)
+        {stack ++ [current], leftover}
 
       {sub, data} ->
         options(data, <<>>, stack ++ [current, sub], data)
