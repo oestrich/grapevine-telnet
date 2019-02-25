@@ -3,7 +3,8 @@ defmodule Telnet.Application do
 
   use Application
 
-  @metrics Application.get_env(:telnet, :metrics) || [server: true, host: [port: 4100]]
+  @default_metrics_config [server: true, host: [port: 4101]]
+  @metrics Application.get_env(:telnet, :metrics) || @default_metrics_config
 
   def start(_type, _args) do
     children = [
