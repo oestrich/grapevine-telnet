@@ -178,7 +178,7 @@ defmodule Telnet.Client do
         :gen_tcp.connect(host, state.port, [:binary, {:packet, :raw}])
 
       "secure telnet" ->
-        :ssl.connect(host, state.port, [:binary])
+        :ssl.connect(host, state.port, [:binary, {:cacerts, :certifi.cacerts()}, {:verify, :verify_peer}, {:depth, 99}])
     end
   end
 

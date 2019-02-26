@@ -97,7 +97,7 @@ defmodule Telnet.Metrics.ClientInstrumenter do
 
   def handle_event([:telnet, :connection, :failed], _count, metadata, _config) do
     Logger.debug(fn ->
-      "Could not connect to a game - #{metadata[:error]}"
+      "Could not connect to a game - #{inspect(metadata[:error])}"
     end, type: :telnet)
     Counter.inc(name: :telnet_connection_failed_total)
   end

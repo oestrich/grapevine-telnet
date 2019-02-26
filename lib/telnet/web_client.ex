@@ -65,6 +65,10 @@ defmodule Telnet.WebClient do
     maybe_forward(state, :echo, "\e[31mConnection refused.\e[0m\n")
   end
 
+  def connection_failed(state, {:tls_alert, 'handshake failure'}) do
+    maybe_forward(state, :echo, "\e[31mInvalid certificate.\e[0m\n")
+  end
+
   def connection_failed(state, _) do
     maybe_forward(state, :echo, "\e[31mConnection failed.\e[0m\n")
   end
