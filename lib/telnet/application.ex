@@ -4,7 +4,7 @@ defmodule Telnet.Application do
   use Application
 
   @default_metrics_config [server: true, host: [port: 4101]]
-  @metrics Application.get_env(:telnet, :metrics) || @default_metrics_config
+  @metrics Application.get_env(:telnet, :metrics) || []
 
   def start(_type, _args) do
     children = [
@@ -45,8 +45,10 @@ defmodule Telnet.Application do
   end
 
   defp metrics_plug() do
-    if @metrics[:server] do
-      Plug.Cowboy.child_spec(scheme: :http, plug: Telnet.Endpoint, options: @metrics[:host])
+    metrics = Keyword.merge(@default_metrics_config, @metrics)
+
+    if metrics[:server] do
+      Plug.Cowboy.child_spec(scheme: :http, plug: Telnet.Endpoint, options: metrics[:host])
     end
   end
 end
