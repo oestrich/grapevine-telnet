@@ -96,13 +96,6 @@ defmodule Telnet.WebClient do
     end
   end
 
-  def process_option(state = %{features: %{gmcp: false}}, {:gmcp, message, data}) do
-    IO.inspect message
-    IO.inspect data
-
-    {:noreply, state}
-  end
-
   # the game is handling echos, aka password prompt
   def process_option(state, {:will, :echo}) do
     maybe_forward(state, :option, {:prompt_type, "password"})
@@ -198,12 +191,10 @@ defmodule Telnet.WebClient do
 
   defp maybe_forward(state = %{channel_pid: channel_pid}, :gmcp, {module, data}) when channel_pid != nil do
     send(state.channel_pid, {:gmcp, module, data})
-    :ok
   end
 
   defp maybe_forward(state = %{channel_pid: channel_pid}, :option, {key, value}) when channel_pid != nil do
     send(state.channel_pid, {:option, key, value})
-    :ok
   end
 
   defp maybe_forward(_state, _type, _data), do: :ok
