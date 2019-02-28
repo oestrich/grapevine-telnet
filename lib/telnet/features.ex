@@ -48,12 +48,26 @@ defmodule Telnet.Features do
   Load all of the supported packages that the client should turn on
   """
   def supported_packages(%{game: game}) when game != nil do
-    game.gauges
-    |> Enum.map(&(&1.package))
-    |> Enum.uniq()
+    gauge_packages = Enum.map(game.gauges, &(&1.package))
+
+    Enum.uniq(gauge_packages ++ client_setting_packages(game))
   end
 
   def supported_packages(_), do: []
+
+  defp client_setting_packages(%{client_settings: client_settings}) do
+    character_package = Map.get(client_settings, :character_package)
+
+    case is_nil(character_package) do
+      true ->
+        []
+
+      false ->
+        [character_package]
+    end
+  end
+
+  defp client_setting_packages(_), do: []
 
   @doc """
   Load all of the supported packages that the client should turn on

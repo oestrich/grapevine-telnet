@@ -32,8 +32,27 @@ defmodule Telnet.FeaturesTest do
       assert packages == ["Character 1", "Room 1"]
     end
 
+    test "loads from the client settings" do
+      game = %{gauges: [], client_settings: %{character_package: "Character 1"}}
+
+      packages = Features.supported_packages(%{game: game})
+
+      assert packages == ["Character 1"]
+    end
+
+    test "client settings is not loaded properly" do
+      game = %{gauges: [], client_settings: %{}}
+
+      packages = Features.supported_packages(%{game: game})
+
+      assert packages == []
+    end
+
     test "packages are uniqued" do
-      game = %{gauges: [%{package: "Character 1"}, %{package: "Character 1"}]}
+      game = %{
+        gauges: [%{package: "Character 1"}, %{package: "Character 1"}],
+        client_settings: %{character_package: "Character 1"}
+      }
 
       packages = Features.supported_packages(%{game: game})
 
