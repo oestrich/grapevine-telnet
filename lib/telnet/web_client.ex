@@ -8,7 +8,7 @@ defmodule Telnet.WebClient do
   alias Telnet.Client
   alias Telnet.ClientSupervisor
   alias Telnet.Features
-  alias Telnet.Metrics
+  alias Telnet.Presence
 
   @behaviour Client
 
@@ -45,7 +45,7 @@ defmodule Telnet.WebClient do
     Process.flag(:trap_exit, true)
     Process.link(channel_pid)
 
-    Metrics.Server.client_online(opts)
+    Presence.client_online(opts)
 
     state
     |> Map.put(:game, Keyword.get(opts, :game))

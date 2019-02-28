@@ -11,7 +11,7 @@ defmodule Telnet.Application do
       cluster_supervisor(),
       metrics_plug(),
       {Telnet.ClientSupervisor, [name: {:global, Telnet.ClientSupervisor}]},
-      {Telnet.Metrics.Server, []},
+      {Telnet.Presence, []},
       {Telemetry.Poller, telemetry_opts()},
     ]
 

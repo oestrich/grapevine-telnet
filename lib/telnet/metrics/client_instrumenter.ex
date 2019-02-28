@@ -7,7 +7,7 @@ defmodule Telnet.Metrics.ClientInstrumenter do
 
   require Logger
 
-  alias Telnet.Metrics.Server
+  alias Telnet.Presence
 
   @doc false
   def setup() do
@@ -76,7 +76,7 @@ defmodule Telnet.Metrics.ClientInstrumenter do
   Called from the telemetry-poller
   """
   def dispatch_client_count() do
-    :telemetry.execute([:telnet, :clients, :online], Server.online_client_count(), %{})
+    :telemetry.execute([:telnet, :clients, :online], Presence.online_client_count(), %{})
   end
 
   def handle_event([:telnet, :clients, :online], count, _metadata, _config) do

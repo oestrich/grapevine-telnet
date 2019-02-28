@@ -1,4 +1,4 @@
-defmodule Telnet.Metrics.Server do
+defmodule Telnet.Presence do
   @moduledoc """
   Small gen server to tick and record gauge metrics
   """
@@ -8,7 +8,7 @@ defmodule Telnet.Metrics.Server do
   alias __MODULE__.Implementation
   alias __MODULE__.OpenClient
 
-  @ets_key Telnet.Clients
+  @ets_key Telnet.Presence
 
   defmodule OpenClient do
     @moduledoc """
@@ -86,7 +86,7 @@ defmodule Telnet.Metrics.Server do
   end
 
   defmodule Implementation do
-    alias Telnet.Metrics.Server
+    alias Telnet.Presence
 
     def online_clients() do
       keys()
@@ -95,7 +95,7 @@ defmodule Telnet.Metrics.Server do
     end
 
     def fetch_from_ets(pid) do
-      case :ets.lookup(Server.ets_key(), pid) do
+      case :ets.lookup(Presence.ets_key(), pid) do
         [{^pid, open_client}] ->
           open_client
 
@@ -105,14 +105,14 @@ defmodule Telnet.Metrics.Server do
     end
 
     def keys() do
-      key = :ets.first(Server.ets_key())
+      key = :ets.first(Presence.ets_key())
       keys(key, [key])
     end
 
     def keys(:"$end_of_table", [:"$end_of_table" | accumulator]), do: accumulator
 
     def keys(current_key, accumulator) do
-      next_key = :ets.next(Server.ets_key(), current_key)
+      next_key = :ets.next(Presence.ets_key(), current_key)
       keys(next_key, [next_key | accumulator])
     end
   end
