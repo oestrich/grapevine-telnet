@@ -49,6 +49,7 @@ defmodule Telnet.WebClient do
 
     state
     |> Map.put(:game, Keyword.get(opts, :game))
+    |> Map.put(:settings, Keyword.get(opts, :client_settings))
     |> Map.put(:type, Keyword.get(opts, :type))
     |> Map.put(:host, Keyword.get(opts, :host))
     |> Map.put(:port, Keyword.get(opts, :port))
@@ -81,6 +82,8 @@ defmodule Telnet.WebClient do
 
   @impl true
   def process_option(state = %{features: %{gmcp: true}}, {:gmcp, message, data}) do
+    state = process_gmcp_message(state, message, data)
+
     case Features.message_enabled?(state, message) do
       true ->
         Logger.debug(fn ->
@@ -119,6 +122,24 @@ defmodule Telnet.WebClient do
   end
 
   def process_option(state, _option), do: {:noreply, state}
+
+  @doc """
+  Globally process a GMCP message
+
+  If the message matches the character message in the web client settings, then
+  record the name and update presence with it.
+  """
+  def process_gmcp_message(state, message, data) do
+    case state.settings.character_message == message do
+      true ->
+        player_name = Map.get(data, state.settings.character_name_path)
+        Presence.set_player_name(player_name)
+        state
+
+      false ->
+        state
+    end
+  end
 
   @impl true
   def receive(state, "") do

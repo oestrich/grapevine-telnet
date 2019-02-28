@@ -47,6 +47,13 @@ defmodule Telnet.Presence do
     GenServer.cast({:global, __MODULE__}, {:client, :online, self(), opts, Timex.now()})
   end
 
+  @doc """
+  Update the client presence with the player name sent from the server
+  """
+  def set_player_name(player_name) do
+    GenServer.cast({:global, __MODULE__}, {:client, :set_player_name, self(), player_name})
+  end
+
   def init(_) do
     Process.flag(:trap_exit, true)
     create_table()
@@ -73,6 +80,18 @@ defmodule Telnet.Presence do
     :ets.insert(@ets_key, {pid, open_client})
 
     {:noreply, Map.put(state, :clients, [pid | state.clients])}
+  end
+
+  def handle_cast({:client, :set_player_name, pid, player_name}, state) do
+    case Implementation.fetch_from_ets(pid) do
+      nil ->
+        {:noreply, state}
+
+      open_client ->
+        open_client = %{open_client | player_name: player_name}
+        :ets.insert(@ets_key, {pid, open_client})
+        {:noreply, state}
+    end
   end
 
   def handle_info({:EXIT, pid, _reason}, state) do
