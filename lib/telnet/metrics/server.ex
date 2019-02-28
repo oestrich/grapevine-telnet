@@ -6,8 +6,17 @@ defmodule Telnet.Metrics.Server do
   use GenServer
 
   alias __MODULE__.Implementation
+  alias __MODULE__.OpenClient
 
   @ets_key Telnet.Clients
+
+  defmodule OpenClient do
+    @moduledoc """
+    Struct for tracking open clients
+    """
+
+    defstruct [:pid, :opened_at, :game, :player_name]
+  end
 
   @doc false
   def ets_key(), do: @ets_key
@@ -54,7 +63,15 @@ defmodule Telnet.Metrics.Server do
 
   def handle_cast({:client, :online, pid, opts, opened_at}, state) do
     Process.link(pid)
-    :ets.insert(@ets_key, {pid, Keyword.get(opts, :game), opened_at})
+
+    open_client = %OpenClient{
+      pid: pid,
+      game: Keyword.get(opts, :game),
+      opened_at: opened_at
+    }
+
+    :ets.insert(@ets_key, {pid, open_client})
+
     {:noreply, Map.put(state, :clients, [pid | state.clients])}
   end
 
@@ -79,8 +96,8 @@ defmodule Telnet.Metrics.Server do
 
     def fetch_from_ets(pid) do
       case :ets.lookup(Server.ets_key(), pid) do
-        [{^pid, game, opened_at}] ->
-          %{pid: pid, game: game, opened_at: opened_at}
+        [{^pid, open_client}] ->
+          open_client
 
         _ ->
           :error
