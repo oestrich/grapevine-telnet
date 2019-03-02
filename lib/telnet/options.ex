@@ -201,8 +201,6 @@ defmodule Telnet.Options do
 
   def transform(<<@iac, @iac_do, @charset>>), do: {:do, :charset}
 
-  def transform(<<@iac, @iac_do, @gmcp>>), do: {:do, :gmcp}
-
   def transform(<<@iac, @iac_do, byte>>), do: {:do, byte}
 
   def transform(<<@iac, @dont, byte>>), do: {:dont, byte}

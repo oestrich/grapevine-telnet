@@ -242,11 +242,6 @@ defmodule Telnet.Client do
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
-  defp process_option(state, option = {:do, :gmcp}) do
-    socket_send(<<255, 251, 201>>, telemetry: [:gmcp, :sent])
-    {:noreply, %{state | processed: [option | state.processed]}}
-  end
-
   defp process_option(state, option = {:do, byte}) when is_integer(byte) do
     socket_send(<<255, 252, byte>>, telemetry: [:dont], metadata: %{byte: byte})
     {:noreply, %{state | processed: [option | state.processed]}}
