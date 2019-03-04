@@ -41,6 +41,13 @@ defmodule Telnet.Presence do
   end
 
   @doc """
+  Fetch clients for a specific game
+  """
+  def online_clients_for(game) do
+    GenServer.call({:global, __MODULE__}, {:clients, :online, :game, game.id})
+  end
+
+  @doc """
   Let the server know a web client came onlin
   """
   def client_online(opts) do
@@ -64,6 +71,10 @@ defmodule Telnet.Presence do
     {:reply, length(state.clients), state}
   end
 
+  def handle_call({:clients, :online, :game, game_id}, _from, state) do
+    {:reply, Implementation.online_clients_for(game_id), state}
+  end
+
   def handle_call({:clients, :online}, _from, state) do
     {:reply, Implementation.online_clients(), state}
   end
@@ -71,13 +82,15 @@ defmodule Telnet.Presence do
   def handle_cast({:client, :online, pid, opts, opened_at}, state) do
     Process.link(pid)
 
+    game = Keyword.get(opts, :game)
+
     open_client = %OpenClient{
       pid: pid,
-      game: Keyword.get(opts, :game),
+      game: game,
       opened_at: opened_at
     }
 
-    :ets.insert(@ets_key, {pid, open_client})
+    :ets.insert(@ets_key, {pid, game.id, open_client})
 
     {:noreply, Map.put(state, :clients, [pid | state.clients])}
   end
@@ -89,7 +102,7 @@ defmodule Telnet.Presence do
 
       open_client ->
         open_client = %{open_client | player_name: player_name}
-        :ets.insert(@ets_key, {pid, open_client})
+        :ets.insert(@ets_key, {pid, open_client.game.id, open_client})
         {:noreply, state}
     end
   end
@@ -107,15 +120,29 @@ defmodule Telnet.Presence do
   defmodule Implementation do
     alias Telnet.Presence
 
+    @doc """
+    Fetch all online web clients
+    """
     def online_clients() do
       keys()
       |> Enum.map(&fetch_from_ets/1)
       |> Enum.reject(&(&1 == :error))
     end
 
+    @doc """
+    Fetch online web clients for a specific game
+    """
+    def online_clients_for(game_id) do
+      matched_games = :ets.match_object(Presence.ets_key(), {:_, game_id, :_})
+
+      Enum.map(matched_games, fn {_pid, _game, open_client} ->
+        open_client
+      end)
+    end
+
     def fetch_from_ets(pid) do
       case :ets.lookup(Presence.ets_key(), pid) do
-        [{^pid, open_client}] ->
+        [{^pid, _game_id, open_client}] ->
           open_client
 
         _ ->
