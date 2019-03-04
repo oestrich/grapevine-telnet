@@ -157,6 +157,9 @@ defmodule Telnet.Options do
       iex> Options.transform(<<255, 253, 34>>)
       {:do, :line_mode}
 
+      iex> Options.transform(<<255, 253, 201>>)
+      {:do, :gmcp}
+
       iex> Options.transform(<<255, 251, 42>>)
       {:will, :charset}
 
@@ -200,6 +203,8 @@ defmodule Telnet.Options do
   def transform(<<@iac, @iac_do, @line_mode>>), do: {:do, :line_mode}
 
   def transform(<<@iac, @iac_do, @charset>>), do: {:do, :charset}
+
+  def transform(<<@iac, @iac_do, @gmcp>>), do: {:do, :gmcp}
 
   def transform(<<@iac, @iac_do, byte>>), do: {:do, byte}
 

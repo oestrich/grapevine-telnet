@@ -242,6 +242,12 @@ defmodule Telnet.Client do
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
+  # Some clients will send a `DO GMCP`, we may have already responded to the WILL
+  # let this fall into the void.
+  defp process_option(state, option = {:do, :gmcp}) do
+    {:noreply, %{state | processed: [option | state.processed]}}
+  end
+
   defp process_option(state, option = {:do, byte}) when is_integer(byte) do
     socket_send(<<255, 252, byte>>, telemetry: [:dont], metadata: %{byte: byte})
     {:noreply, %{state | processed: [option | state.processed]}}
