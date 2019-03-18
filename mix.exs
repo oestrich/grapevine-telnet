@@ -27,6 +27,8 @@ defmodule Telnet.MixProject do
       {:jason, "~> 1.1"},
       {:libcluster, "~> 3.0"},
       {:plug_cowboy, "~> 2.0"},
+      {:phoenix, "~> 1.4", override: true},
+      {:phoenix_pubsub, "~> 1.0"},
       {:prometheus_ex, "~> 3.0"},
       {:prometheus_plugs, "~> 1.1.1"},
       {:sentry, "~> 7.0"},

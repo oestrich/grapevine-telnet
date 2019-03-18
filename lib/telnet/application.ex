@@ -10,6 +10,7 @@ defmodule Telnet.Application do
     children = [
       cluster_supervisor(),
       metrics_plug(),
+      {Phoenix.PubSub.PG2, [name: Grapevine.PubSub]},
       {Telnet.ClientSupervisor, [name: {:global, Telnet.ClientSupervisor}]},
       {Telnet.Presence, []},
       {Telemetry.Poller, telemetry_opts()},
