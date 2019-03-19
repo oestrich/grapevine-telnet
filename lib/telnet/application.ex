@@ -10,7 +10,7 @@ defmodule Telnet.Application do
     children = [
       cluster_supervisor(),
       metrics_plug(),
-      {Phoenix.PubSub.PG2, [name: Grapevine.PubSub]},
+      phoenix_pubsub(),
       {Telnet.ClientSupervisor, [name: {:global, Telnet.ClientSupervisor}]},
       {Telnet.Presence, []},
       {Telemetry.Poller, telemetry_opts()},
@@ -50,6 +50,13 @@ defmodule Telnet.Application do
 
     if metrics[:server] do
       Plug.Cowboy.child_spec(scheme: :http, plug: Telnet.Endpoint, options: metrics[:host])
+    end
+  end
+
+  defp phoenix_pubsub() do
+    pubsub = Application.get_env(:telnet, :pubsub)
+    if pubsub[:start] do
+      {Phoenix.PubSub.PG2, [name: Grapevine.PubSub]}
     end
   end
 end

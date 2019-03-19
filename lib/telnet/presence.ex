@@ -92,7 +92,7 @@ defmodule Telnet.Presence do
 
     :ets.insert(@ets_key, {pid, game.id, open_client})
 
-    Phoenix.Channel.Server.broadcast(Grapevine.PubSub, "telnet:presence", "client/online", open_client)
+    broadcast("client/online", open_client)
 
     {:noreply, Map.put(state, :clients, [pid | state.clients])}
   end
@@ -105,19 +105,23 @@ defmodule Telnet.Presence do
       open_client ->
         open_client = %{open_client | player_name: player_name}
         :ets.insert(@ets_key, {pid, open_client.game.id, open_client})
-        Phoenix.Channel.Server.broadcast(Grapevine.PubSub, "telnet:presence", "client/update", open_client)
+        broadcast("client/update", open_client)
         {:noreply, state}
     end
   end
 
   def handle_info({:EXIT, pid, _reason}, state) do
     open_client = Implementation.fetch_from_ets(pid)
-    Phoenix.Channel.Server.broadcast(Grapevine.PubSub, "telnet:presence", "client/offline", open_client)
+    broadcast("client/offline", open_client)
 
     state = Map.put(state, :clients, List.delete(state.clients, pid))
     :ets.delete(@ets_key, pid)
 
     {:noreply, state}
+  end
+
+  defp broadcast(event, client) do
+    Phoenix.Channel.Server.broadcast(Grapevine.PubSub, "telnet:presence", event, client)
   end
 
   defp create_table() do
