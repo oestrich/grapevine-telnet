@@ -17,6 +17,7 @@ defmodule Telnet.Application do
     ]
 
     report_errors = Application.get_env(:telnet, :errors)[:report]
+
     if report_errors do
       {:ok, _} = Logger.add_backend(Sentry.LoggerBackend)
     end
@@ -55,6 +56,7 @@ defmodule Telnet.Application do
 
   defp phoenix_pubsub() do
     pubsub = Application.get_env(:telnet, :pubsub)
+
     if pubsub[:start] do
       {Phoenix.PubSub.PG2, [name: Grapevine.PubSub]}
     end
