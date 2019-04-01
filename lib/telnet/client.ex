@@ -85,6 +85,7 @@ defmodule Telnet.Client do
     module = Keyword.get(opts, :module)
 
     state = %{
+      sid: UUID.uuid4(),
       module: module,
       buffer: <<>>,
       processed: [],

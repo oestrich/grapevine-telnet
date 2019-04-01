@@ -7,6 +7,7 @@ defmodule Telnet.Presence do
 
   alias __MODULE__.Implementation
   alias __MODULE__.OpenClient
+  alias Telnet.Statistics
 
   @ets_key Telnet.Presence
 
@@ -15,7 +16,7 @@ defmodule Telnet.Presence do
     Struct for tracking open clients
     """
 
-    defstruct [:pid, :opened_at, :game, :player_name]
+    defstruct [:pid, :sid, :opened_at, :game, :player_name]
   end
 
   @doc false
@@ -50,8 +51,8 @@ defmodule Telnet.Presence do
   @doc """
   Let the server know a web client came online
   """
-  def client_online(opts) do
-    GenServer.cast({:global, __MODULE__}, {:client, :online, self(), opts, Timex.now()})
+  def client_online(sid, opts) do
+    GenServer.cast({:global, __MODULE__}, {:client, :online, self(), sid, opts, Timex.now()})
   end
 
   @doc """
@@ -79,16 +80,19 @@ defmodule Telnet.Presence do
     {:reply, Implementation.online_clients(), state}
   end
 
-  def handle_cast({:client, :online, pid, opts, opened_at}, state) do
+  def handle_cast({:client, :online, pid, sid, opts, opened_at}, state) do
     Process.link(pid)
 
     game = Keyword.get(opts, :game)
 
     open_client = %OpenClient{
       pid: pid,
+      sid: sid,
       game: game,
       opened_at: opened_at
     }
+
+    Statistics.session_started(game, sid)
 
     :ets.insert(@ets_key, {pid, game.id, open_client})
 
@@ -112,6 +116,7 @@ defmodule Telnet.Presence do
 
   def handle_info({:EXIT, pid, _reason}, state) do
     open_client = Implementation.fetch_from_ets(pid)
+    Statistics.session_closed(open_client.sid)
     broadcast("client/offline", open_client)
 
     state = Map.put(state, :clients, List.delete(state.clients, pid))

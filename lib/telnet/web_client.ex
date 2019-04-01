@@ -45,7 +45,7 @@ defmodule Telnet.WebClient do
     Process.flag(:trap_exit, true)
     Process.link(channel_pid)
 
-    Presence.client_online(opts)
+    Presence.client_online(state.sid, opts)
 
     state
     |> Map.put(:game, Keyword.get(opts, :game))
