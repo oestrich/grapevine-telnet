@@ -5,6 +5,7 @@ defmodule Telnet.Options do
 
   alias Telnet.GMCP
   alias Telnet.MSSP
+  alias Telnet.OAuth
 
   @se 240
   @nop 241
@@ -21,6 +22,7 @@ defmodule Telnet.Options do
   @line_mode 34
   @charset 42
   @mssp 70
+  @oauth 165
   @gmcp 201
 
   @charset_request 1
@@ -178,6 +180,18 @@ defmodule Telnet.Options do
       iex> Options.transform(<<255, 252, 1>>)
       {:wont, :echo}
 
+      iex> Options.transform(<<255, 251, 165>>)
+      {:will, :oauth}
+
+      iex> Options.transform(<<255, 252, 165>>)
+      {:wont, :oauth}
+
+      iex> Options.transform(<<255, 253, 165>>)
+      {:do, :oauth}
+
+      iex> Options.transform(<<255, 254, 165>>)
+      {:dont, :oauth}
+
   Returns a generic DO/WILL if the specific term is not known. For
   responding with the opposite command to reject.
 
@@ -204,15 +218,23 @@ defmodule Telnet.Options do
 
   def transform(<<@iac, @iac_do, @charset>>), do: {:do, :charset}
 
+  def transform(<<@iac, @iac_do, @oauth>>), do: {:do, :oauth}
+
   def transform(<<@iac, @iac_do, @gmcp>>), do: {:do, :gmcp}
 
+  def transform(<<@iac, @iac_do, @mssp>>), do: {:do, :mssp}
+
   def transform(<<@iac, @iac_do, byte>>), do: {:do, byte}
+
+  def transform(<<@iac, @dont, @oauth>>), do: {:dont, :oauth}
 
   def transform(<<@iac, @dont, byte>>), do: {:dont, byte}
 
   def transform(<<@iac, @will, @echo>>), do: {:will, :echo}
 
   def transform(<<@iac, @will, @mssp>>), do: {:will, :mssp}
+
+  def transform(<<@iac, @will, @oauth>>), do: {:will, :oauth}
 
   def transform(<<@iac, @will, @gmcp>>), do: {:will, :gmcp}
 
@@ -223,6 +245,8 @@ defmodule Telnet.Options do
   def transform(<<@iac, @wont, @echo>>), do: {:wont, :echo}
 
   def transform(<<@iac, @wont, @mssp>>), do: {:wont, :mssp}
+
+  def transform(<<@iac, @wont, @oauth>>), do: {:wont, :oauth}
 
   def transform(<<@iac, @wont, byte>>), do: {:wont, byte}
 
@@ -243,6 +267,16 @@ defmodule Telnet.Options do
   def transform(<<@iac, @sb, @charset, @charset_request, sep::size(8), data::binary>>) do
     data = parse_charset(data)
     {:charset, :request, <<sep>>, data}
+  end
+
+  def transform(<<@iac, @sb, @oauth, data::binary>>) do
+    case OAuth.parse(data) do
+      {:ok, module, data} ->
+        {:oauth, module, data}
+
+      :error ->
+        :unknown
+    end
   end
 
   def transform(<<@iac, @sb, @gmcp, data::binary>>) do

@@ -243,6 +243,13 @@ defmodule Telnet.Client do
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
+  defp process_option(state, option = {:do, :oauth}) do
+    socket_send(<<255, 251, 165>>, telemetry: [:oauth, :sent])
+    params = %{host: "grapevine.haus"}
+    socket_send(<<255, 250, 165>> <> "Start " <> Jason.encode!(params) <> <<255, 240>>, telemetry: [:oauth, :start])
+    {:noreply, %{state | processed: [option | state.processed]}}
+  end
+
   # Some clients will send a `DO GMCP`, we may have already responded to the WILL
   # let this fall into the void.
   defp process_option(state, option = {:do, :gmcp}) do
@@ -307,6 +314,10 @@ defmodule Telnet.Client do
     metadata = maybe_add_game_to_metadata(state, %{})
     :telemetry.execute([:telnet, :gmcp, :received], 1, metadata)
 
+    state.module.process_option(state, option)
+  end
+
+  defp process_option(state, option = {:oauth, _, _}) do
     state.module.process_option(state, option)
   end
 
