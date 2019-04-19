@@ -18,6 +18,10 @@ defmodule Telnet.WebClient do
     send(pid, {:recv, message})
   end
 
+  def event(pid, type, payload) do
+    send(pid, {:event, type, payload})
+  end
+
   def connect(session_token, opts) do
     case :global.whereis_name(pid(session_token, opts)) do
       :undefined ->
@@ -121,6 +125,11 @@ defmodule Telnet.WebClient do
     {:noreply, state}
   end
 
+  def process_option(state, {:oauth, message, data}) do
+    maybe_forward(state, :oauth, {message, data})
+    {:noreply, state}
+  end
+
   def process_option(state, _option), do: {:noreply, state}
 
   @doc """
@@ -203,6 +212,23 @@ defmodule Telnet.WebClient do
     end
   end
 
+  def handle_info({:event, "oauth", payload}, state) do
+    case payload.type do
+      "AuthorizationGrant" ->
+        params = %{
+          state: payload.state,
+          code: payload.code
+        }
+        message = <<255, 250, 165>> <> "AuthorizationGrant " <> Jason.encode!(params) <> <<255, 240>>
+        Client.socket_send(message, [])
+
+        {:noreply, state}
+
+      _ ->
+        {:noreply, state}
+    end
+  end
+
   defp rebroadcast_gmcp(state = %{features: %{gmcp: true}}) do
     Enum.each(state.features.message_cache, fn {message, data} ->
       maybe_forward(state, :gmcp, {message, data})
@@ -217,6 +243,10 @@ defmodule Telnet.WebClient do
 
   defp maybe_forward(state = %{channel_pid: channel_pid}, :gmcp, {module, data}) when channel_pid != nil do
     send(state.channel_pid, {:gmcp, module, data})
+  end
+
+  defp maybe_forward(state = %{channel_pid: channel_pid}, :oauth, {module, data}) when channel_pid != nil do
+    send(state.channel_pid, {:oauth, module, data})
   end
 
   defp maybe_forward(state = %{channel_pid: channel_pid}, :option, {key, value}) when channel_pid != nil do
