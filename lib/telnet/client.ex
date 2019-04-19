@@ -243,10 +243,16 @@ defmodule Telnet.Client do
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
-  defp process_option(state, option = {:do, :oauth}) do
+  defp process_option(state = %{type: "secure telnet"}, option = {:do, :oauth}) do
     socket_send(<<255, 251, 165>>, telemetry: [:oauth, :sent])
     params = %{host: "grapevine.haus"}
     socket_send(<<255, 250, 165>> <> "Start " <> Jason.encode!(params) <> <<255, 240>>, telemetry: [:oauth, :start])
+    {:noreply, %{state | processed: [option | state.processed]}}
+  end
+
+  # Not secure telnet, so we WONT do oauth
+  defp process_option(state, option = {:do, :oauth}) do
+    socket_send(<<255, 252, 165>>, telemetry: [:oauth, :sent])
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
