@@ -171,16 +171,40 @@ defmodule Telnet.Client do
     state.module.handle_info(message, state)
   end
 
-  defp connect(state) do
+  defp connect(state = %{type: "telnet"}) do
     host = String.to_charlist(state.host)
+    :gen_tcp.connect(host, state.port, [:binary, {:packet, :raw}])
+  end
 
-    case state.type do
-      "telnet" ->
-        :gen_tcp.connect(host, state.port, [:binary, {:packet, :raw}])
+  defp connect(state = %{type: "secure telnet"}) do
+    host = String.to_charlist(state.host)
+    opts = [:binary, {:cacerts, :certifi.cacerts()}, {:depth, 99}]
 
-      "secure telnet" ->
-        :ssl.connect(host, state.port, [:binary, {:cacerts, :certifi.cacerts()}, {:verify, :verify_peer}, {:depth, 99}])
+    case is_nil(state.certificate) do
+      true ->
+        :ssl.connect(host, state.port, [{:verify, :verify_peer} | opts])
+
+      false ->
+        :ssl.connect(host, state.port, [{:verify_fun, {&verify_cert/3, [state.certificate]}} | opts])
     end
+  end
+
+  defp verify_cert(cert, {:bad_cert, :selfsigned_peer}, state = [pinned_cert]) do
+    {_, _, _, cert_binary} = cert
+    [{:Certificate, pinned_cert, :not_encrypted}] = :public_key.pem_decode(pinned_cert)
+    pinned_cert = :public_key.der_decode(:Certificate, pinned_cert)
+
+    case pinned_cert do
+      {_, _, _, ^cert_binary} ->
+        {:valid, state}
+
+      _ ->
+        {:fail, "invalid"}
+    end
+  end
+
+  defp verify_cert(_cert, reason, _state) do
+    {:fail, reason}
   end
 
   defp process_data(data, state) do
