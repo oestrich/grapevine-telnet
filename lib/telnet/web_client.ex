@@ -57,6 +57,7 @@ defmodule Telnet.WebClient do
     |> Map.put(:type, Keyword.get(opts, :type))
     |> Map.put(:host, Keyword.get(opts, :host))
     |> Map.put(:port, Keyword.get(opts, :port))
+    |> Map.put(:certificate, Keyword.get(opts, :certificate))
     |> Map.put(:channel_pid, channel_pid)
     |> Map.put(:channel_buffer, <<>>)
   end
