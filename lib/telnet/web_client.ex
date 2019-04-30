@@ -111,12 +111,16 @@ defmodule Telnet.WebClient do
 
   # the game is handling echos, aka password prompt
   def process_option(state, {:will, :echo}) do
+    # Send back DO ECHO
+    Client.socket_send(<<255, 253, 1>>, [])
     maybe_forward(state, :option, {:prompt_type, "password"})
     {:noreply, state}
   end
 
   # password is over
   def process_option(state, {:wont, :echo}) do
+    # Send back DONT ECHO
+    Client.socket_send(<<255, 254, 1>>, [])
     maybe_forward(state, :option, {:prompt_type, "text"})
     {:noreply, state}
   end
