@@ -50,7 +50,7 @@ defmodule Telnet.Features do
   def supported_packages(%{game: game}) when game != nil do
     gauge_packages = Enum.map(game.gauges, &(&1.package))
 
-    Enum.uniq(gauge_packages ++ client_setting_packages(game))
+    Enum.uniq(gauge_packages ++ client_setting_packages(game) ++ base_packages())
   end
 
   def supported_packages(_), do: []
@@ -78,9 +78,20 @@ defmodule Telnet.Features do
       |> Enum.map(&(&1.message))
       |> Enum.uniq()
 
+    messages = messages ++ base_messagse()
     features = Map.put(state.features, :messages, messages)
     Map.put(state, :features, features)
   end
 
   def cache_supported_messages(state), do: state
+
+  @doc """
+  Base packages that the client will try to turn on
+  """
+  def base_packages(), do: ["Client.Modals 1"]
+
+  @doc """
+  Base messages that are known for the client
+  """
+  def base_messagse(), do: ["Client.Modals.Open"]
 end
