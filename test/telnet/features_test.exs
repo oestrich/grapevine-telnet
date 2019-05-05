@@ -29,7 +29,7 @@ defmodule Telnet.FeaturesTest do
 
       packages = Features.supported_packages(%{game: game})
 
-      assert packages == ["Character 1", "Room 1"]
+      assert packages == ["Character 1", "Room 1", "Client.Modals 1"]
     end
 
     test "loads from the client settings" do
@@ -37,7 +37,7 @@ defmodule Telnet.FeaturesTest do
 
       packages = Features.supported_packages(%{game: game})
 
-      assert packages == ["Character 1"]
+      assert packages == ["Character 1", "Client.Modals 1"]
     end
 
     test "client settings is not loaded properly" do
@@ -45,7 +45,7 @@ defmodule Telnet.FeaturesTest do
 
       packages = Features.supported_packages(%{game: game})
 
-      assert packages == []
+      assert packages == ["Client.Modals 1"]
     end
 
     test "packages are uniqued" do
@@ -56,7 +56,7 @@ defmodule Telnet.FeaturesTest do
 
       packages = Features.supported_packages(%{game: game})
 
-      assert packages == ["Character 1"]
+      assert packages == ["Character 1", "Client.Modals 1"]
     end
 
     test "no game is loaded" do
@@ -71,7 +71,7 @@ defmodule Telnet.FeaturesTest do
 
       state = Features.cache_supported_messages(%{game: game, features: %Features{}})
 
-      assert state.features.messages == ["Character.Vitals", "Room.Info"]
+      assert state.features.messages == ["Character.Vitals", "Room.Info", "Client.Modals.Open"]
     end
 
     test "unique messages" do
@@ -79,7 +79,7 @@ defmodule Telnet.FeaturesTest do
 
       state = Features.cache_supported_messages(%{game: game, features: %Features{}})
 
-      assert state.features.messages == ["Character.Vitals"]
+      assert state.features.messages == ["Character.Vitals", "Client.Modals.Open"]
     end
 
     test "without a game" do
