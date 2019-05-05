@@ -38,6 +38,10 @@ defmodule Telnet.Features do
   @doc """
   Cache the message for repeating to a reloaded browser
   """
+  def cache_message(state, message, data)
+
+  def cache_message(state, "Client.Modals" <> _, _data), do: state
+
   def cache_message(state, message, data) do
     cache = Map.put(state.features.message_cache, message, data)
     features = Map.put(state.features, :message_cache, cache)
