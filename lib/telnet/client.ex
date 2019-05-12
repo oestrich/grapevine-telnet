@@ -249,11 +249,6 @@ defmodule GrapevineTelnet.Client do
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
-  defp process_option(state, option = {:will, byte}) when is_integer(byte) do
-    socket_send(<<255, 254, byte>>, telementry: [:wont], metadata: %{byte: byte})
-    {:noreply, %{state | processed: [option | state.processed]}}
-  end
-
   defp process_option(state, option = {:do, :term_type}) do
     socket_send(@will_term_type, telemetry: [:term_type, :sent])
     {:noreply, %{state | processed: [option | state.processed]}}
@@ -289,11 +284,6 @@ defmodule GrapevineTelnet.Client do
   # Some clients will send a `DO GMCP`, we may have already responded to the WILL
   # let this fall into the void.
   defp process_option(state, option = {:do, :gmcp}) do
-    {:noreply, %{state | processed: [option | state.processed]}}
-  end
-
-  defp process_option(state, option = {:do, byte}) when is_integer(byte) do
-    socket_send(<<255, 252, byte>>, telemetry: [:dont], metadata: %{byte: byte})
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
@@ -379,6 +369,18 @@ defmodule GrapevineTelnet.Client do
 
   defp process_option(state, {:will, :echo}) do
     state.module.process_option(state, {:will, :echo})
+  end
+
+  defp process_option(state, {:will, option}) do
+    byte = Options.option_to_byte(option)
+    socket_send(<<255, 254, byte>>, telementry: [:wont], metadata: %{option: option})
+    {:noreply, %{state | processed: [{:will, option} | state.processed]}}
+  end
+
+  defp process_option(state, {:do, option}) do
+    byte = Options.option_to_byte(option)
+    socket_send(<<255, 252, byte>>, telemetry: [:dont], metadata: %{option: option})
+    {:noreply, %{state | processed: [{:do, option} | state.processed]}}
   end
 
   defp process_option(state, option) do
