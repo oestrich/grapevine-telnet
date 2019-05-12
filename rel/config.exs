@@ -43,8 +43,8 @@ end
 # when running `mix release`, the first release in the file
 # will be used by default
 
-release :telnet do
-  set version: current_version(:telnet)
+release :grapevine_telnet do
+  set version: current_version(:grapevine_telnet)
   set applications: [
     :runtime_tools
   ]

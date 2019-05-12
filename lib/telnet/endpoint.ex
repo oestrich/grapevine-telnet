@@ -1,7 +1,7 @@
-defmodule Telnet.Endpoint do
+defmodule GrapevineTelnet.Endpoint do
   use Plug.Router
 
-  plug Telnet.Metrics.PlugExporter
+  plug GrapevineTelnet.Metrics.PlugExporter
 
   plug :match
   plug :dispatch

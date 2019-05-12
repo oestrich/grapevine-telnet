@@ -1,4 +1,4 @@
-defmodule Telnet.Presence do
+defmodule GrapevineTelnet.Presence do
   @moduledoc """
   Small gen server to tick and record gauge metrics
   """
@@ -7,9 +7,9 @@ defmodule Telnet.Presence do
 
   alias __MODULE__.Implementation
   alias __MODULE__.OpenClient
-  alias Telnet.Statistics
+  alias GrapevineTelnet.Statistics
 
-  @ets_key Telnet.Presence
+  @ets_key GrapevineTelnet.Presence
 
   defmodule OpenClient do
     @moduledoc """
@@ -134,7 +134,9 @@ defmodule Telnet.Presence do
   end
 
   defmodule Implementation do
-    alias Telnet.Presence
+    @moduledoc false
+
+    alias GrapevineTelnet.Presence
 
     @doc """
     Fetch all online web clients

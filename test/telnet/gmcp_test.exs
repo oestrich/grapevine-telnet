@@ -1,7 +1,7 @@
-defmodule Telnet.GMCPTest do
+defmodule GrapevineTelnet.GMCPTest do
   use ExUnit.Case
 
-  alias Telnet.GMCP
+  alias GrapevineTelnet.GMCP
 
   doctest GMCP
 

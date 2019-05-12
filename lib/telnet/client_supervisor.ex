@@ -1,11 +1,11 @@
-defmodule Telnet.ClientSupervisor do
+defmodule GrapevineTelnet.ClientSupervisor do
   @moduledoc """
   A supervisor to look over all web client processes
   """
 
   use DynamicSupervisor
 
-  alias Telnet.Client
+  alias GrapevineTelnet.Client
 
   def start_link(opts) do
     DynamicSupervisor.start_link(__MODULE__, [], opts)

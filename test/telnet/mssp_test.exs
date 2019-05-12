@@ -1,7 +1,7 @@
-defmodule Telnet.MSSPTest do
+defmodule GrapevineTelnet.MSSPTest do
   use ExUnit.Case
 
-  alias Telnet.MSSP
+  alias GrapevineTelnet.MSSP
 
   describe "parsing MSSP variables" do
     test "pulls out variable names and values" do

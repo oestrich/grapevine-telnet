@@ -1,7 +1,7 @@
-defmodule Telnet.OptionsTest do
+defmodule GrapevineTelnet.OptionsTest do
   use ExUnit.Case
 
-  alias Telnet.Options
+  alias GrapevineTelnet.Options
 
   doctest Options
 

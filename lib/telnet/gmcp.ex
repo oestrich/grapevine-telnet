@@ -1,4 +1,4 @@
-defmodule Telnet.GMCP do
+defmodule GrapevineTelnet.GMCP do
   @moduledoc """
   Parse GMCP messages
   """

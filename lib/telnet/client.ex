@@ -1,4 +1,4 @@
-defmodule Telnet.Client do
+defmodule GrapevineTelnet.Client do
   @moduledoc """
   A client to check for MSSP data
   """
@@ -7,8 +7,8 @@ defmodule Telnet.Client do
 
   require Logger
 
-  alias Telnet.Features
-  alias Telnet.Options
+  alias GrapevineTelnet.Features
+  alias GrapevineTelnet.Options
 
   @type message() :: any()
   @type option() :: tuple()
@@ -234,7 +234,7 @@ defmodule Telnet.Client do
 
   defp process_option(state, option = {:will, :gmcp}) do
     socket_send(<<255, 253, 201>>, telemetry: [:gmcp, :sent])
-    hello = Jason.encode!(%{client: "Grapevine", version: Telnet.version()})
+    hello = Jason.encode!(%{client: "Grapevine", version: GrapevineTelnet.version()})
     socket_send(<<255, 250, 201>> <> "Core.Hello #{hello}" <> <<255, 240>>, [])
     state = Features.enable_gmcp(state)
 

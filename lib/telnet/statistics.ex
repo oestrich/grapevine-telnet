@@ -1,4 +1,4 @@
-defmodule Telnet.Statistics do
+defmodule GrapevineTelnet.Statistics do
   @moduledoc """
   Record statistics about open web clients
   """

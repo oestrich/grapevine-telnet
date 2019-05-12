@@ -1,6 +1,6 @@
-defmodule Telnet do
+defmodule GrapevineTelnet do
   @moduledoc """
-  An Elixir telnet client
+  Grapevine telnet client
   """
 
   @doc """

@@ -1,7 +1,7 @@
-defmodule Telnet.FeaturesTest do
+defmodule GrapevineTelnet.FeaturesTest do
   use ExUnit.Case
 
-  alias Telnet.Features
+  alias GrapevineTelnet.Features
 
   doctest Features
 

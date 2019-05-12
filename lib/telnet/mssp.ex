@@ -1,4 +1,4 @@
-defmodule Telnet.MSSP do
+defmodule GrapevineTelnet.MSSP do
   @moduledoc """
   Parse MSSP data
 

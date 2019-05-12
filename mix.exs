@@ -1,9 +1,9 @@
-defmodule Telnet.MixProject do
+defmodule GrapevineTelnet.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :telnet,
+      app: :grapevine_telnet,
       version: "1.0.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule Telnet.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Telnet.Application, []}
+      mod: {GrapevineTelnet.Application, []}
     ]
   end
 

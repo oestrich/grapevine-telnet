@@ -1,4 +1,4 @@
-defmodule Telnet.OAuth do
+defmodule GrapevineTelnet.OAuth do
   @moduledoc """
   Parse OAuth messages
   """

@@ -1,14 +1,14 @@
-defmodule Telnet.WebClient do
+defmodule GrapevineTelnet.WebClient do
   @moduledoc """
   Callbacks for specifically checking MSSP data
   """
 
   require Logger
 
-  alias Telnet.Client
-  alias Telnet.ClientSupervisor
-  alias Telnet.Features
-  alias Telnet.Presence
+  alias GrapevineTelnet.Client
+  alias GrapevineTelnet.ClientSupervisor
+  alias GrapevineTelnet.Features
+  alias GrapevineTelnet.Presence
 
   @behaviour Client
 

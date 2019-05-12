@@ -1,4 +1,4 @@
-defmodule Telnet.Features do
+defmodule GrapevineTelnet.Features do
   @moduledoc """
   Struct and functions for tracking Telnet option statuses
   """

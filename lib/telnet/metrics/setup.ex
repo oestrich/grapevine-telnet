@@ -1,11 +1,11 @@
-defmodule Telnet.Metrics.Setup do
+defmodule GrapevineTelnet.Metrics.Setup do
   @moduledoc """
   Set up all of the local metrics
   """
 
   @doc false
   def setup() do
-    Telnet.Metrics.ClientInstrumenter.setup()
-    Telnet.Metrics.PlugExporter.setup()
+    GrapevineTelnet.Metrics.ClientInstrumenter.setup()
+    GrapevineTelnet.Metrics.PlugExporter.setup()
   end
 end

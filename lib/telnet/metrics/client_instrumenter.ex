@@ -1,4 +1,4 @@
-defmodule Telnet.Metrics.ClientInstrumenter do
+defmodule GrapevineTelnet.Metrics.ClientInstrumenter do
   @moduledoc """
   Instrumentation for the telnet client
   """
@@ -7,7 +7,7 @@ defmodule Telnet.Metrics.ClientInstrumenter do
 
   require Logger
 
-  alias Telnet.Presence
+  alias GrapevineTelnet.Presence
 
   @doc false
   def setup() do

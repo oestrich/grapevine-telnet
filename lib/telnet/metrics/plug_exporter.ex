@@ -1,4 +1,4 @@
-defmodule Telnet.Metrics.PlugExporter do
+defmodule GrapevineTelnet.Metrics.PlugExporter do
   @moduledoc false
 
   use Prometheus.PlugExporter

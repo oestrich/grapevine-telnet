@@ -1,11 +1,11 @@
-defmodule Telnet.Options do
+defmodule GrapevineTelnet.Options do
   @moduledoc """
   Parse telnet IAC options coming from the game
   """
 
-  alias Telnet.GMCP
-  alias Telnet.MSSP
-  alias Telnet.OAuth
+  alias GrapevineTelnet.GMCP
+  alias GrapevineTelnet.MSSP
+  alias GrapevineTelnet.OAuth
 
   @se 240
   @nop 241
