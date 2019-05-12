@@ -35,7 +35,7 @@ defmodule GrapevineTelnet.MixProject do
       {:sentry, "~> 7.0"},
       {:telemetry, "~> 0.3.0"},
       {:telemetry_poller, "~> 0.2.0"},
-      {:timex, "~> 3.1"},
+      {:timex, "~> 3.1"}
     ]
   end
 end
