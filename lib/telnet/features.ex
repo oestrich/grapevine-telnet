@@ -3,7 +3,7 @@ defmodule GrapevineTelnet.Features do
   Struct and functions for tracking Telnet option statuses
   """
 
-  defstruct [gmcp: false, packages: [], messages: [], message_cache: %{}]
+  defstruct gmcp: false, packages: [], messages: [], message_cache: %{}
 
   @doc """
   Enable GMCP on the telnet state
@@ -52,7 +52,7 @@ defmodule GrapevineTelnet.Features do
   Load all of the supported packages that the client should turn on
   """
   def supported_packages(%{game: game}) when game != nil do
-    gauge_packages = Enum.map(game.gauges, &(&1.package))
+    gauge_packages = Enum.map(game.gauges, & &1.package)
 
     Enum.uniq(gauge_packages ++ client_setting_packages(game) ++ base_packages())
   end
@@ -79,7 +79,7 @@ defmodule GrapevineTelnet.Features do
   def cache_supported_messages(state = %{game: game}) when game != nil do
     messages =
       game.gauges
-      |> Enum.map(&(&1.message))
+      |> Enum.map(& &1.message)
       |> Enum.uniq()
 
     messages = messages ++ base_messagse()

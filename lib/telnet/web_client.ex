@@ -25,7 +25,10 @@ defmodule GrapevineTelnet.WebClient do
   def connect(session_token, opts) do
     case :global.whereis_name(pid(session_token, opts)) do
       :undefined ->
-        ClientSupervisor.start_client(__MODULE__, opts ++ [name: {:global, pid(session_token, opts)}])
+        ClientSupervisor.start_client(
+          __MODULE__,
+          opts ++ [name: {:global, pid(session_token, opts)}]
+        )
 
       pid ->
         set_channel(pid, opts[:channel_pid])
@@ -91,9 +94,12 @@ defmodule GrapevineTelnet.WebClient do
 
     case Features.message_enabled?(state, message) do
       true ->
-        Logger.debug(fn ->
-          "Received GMCP message #{message}"
-        end, type: :telnet)
+        Logger.debug(
+          fn ->
+            "Received GMCP message #{message}"
+          end,
+          type: :telnet
+        )
 
         maybe_forward(state, :gmcp, {message, data})
         state = Features.cache_message(state, message, data)
@@ -101,9 +107,12 @@ defmodule GrapevineTelnet.WebClient do
         {:noreply, state}
 
       false ->
-        Logger.debug(fn ->
-          "Received unknown GMCP message #{message}"
-        end, type: :telnet)
+        Logger.debug(
+          fn ->
+            "Received unknown GMCP message #{message}"
+          end,
+          type: :telnet
+        )
 
         {:noreply, state}
     end
@@ -164,6 +173,7 @@ defmodule GrapevineTelnet.WebClient do
     maybe_forward(state, :echo, data)
 
     buffer = String.split(state.channel_buffer <> data, "\n")
+
     buffer =
       buffer
       |> Enum.take(-20)
@@ -182,6 +192,7 @@ defmodule GrapevineTelnet.WebClient do
     if state.channel_pid != nil do
       Process.unlink(state.channel_pid)
     end
+
     Process.link(channel_pid)
 
     state = Map.put(state, :channel_pid, channel_pid)
@@ -224,7 +235,10 @@ defmodule GrapevineTelnet.WebClient do
           state: payload.state,
           code: payload.code
         }
-        message = <<255, 250, 165>> <> "AuthorizationGrant " <> Jason.encode!(params) <> <<255, 240>>
+
+        message =
+          <<255, 250, 165>> <> "AuthorizationGrant " <> Jason.encode!(params) <> <<255, 240>>
+
         Client.socket_send(message, [])
 
         {:noreply, state}
@@ -246,15 +260,18 @@ defmodule GrapevineTelnet.WebClient do
     send(state.channel_pid, {:echo, String.replace(data, "\r", "")})
   end
 
-  defp maybe_forward(state = %{channel_pid: channel_pid}, :gmcp, {module, data}) when channel_pid != nil do
+  defp maybe_forward(state = %{channel_pid: channel_pid}, :gmcp, {module, data})
+       when channel_pid != nil do
     send(state.channel_pid, {:gmcp, module, data})
   end
 
-  defp maybe_forward(state = %{channel_pid: channel_pid}, :oauth, {module, data}) when channel_pid != nil do
+  defp maybe_forward(state = %{channel_pid: channel_pid}, :oauth, {module, data})
+       when channel_pid != nil do
     send(state.channel_pid, {:oauth, module, data})
   end
 
-  defp maybe_forward(state = %{channel_pid: channel_pid}, :option, {key, value}) when channel_pid != nil do
+  defp maybe_forward(state = %{channel_pid: channel_pid}, :option, {key, value})
+       when channel_pid != nil do
     send(state.channel_pid, {:option, key, value})
   end
 

@@ -58,7 +58,7 @@ defmodule GrapevineTelnet.Options do
     string =
       options
       |> Enum.filter(&is_string?/1)
-      |> Enum.map(&(elem(&1, 1)))
+      |> Enum.map(&elem(&1, 1))
       |> Enum.join()
 
     options =

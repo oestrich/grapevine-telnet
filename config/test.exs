@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :telnet, :metrics, server: false
+config :grapevine_telnet, :metrics, server: false

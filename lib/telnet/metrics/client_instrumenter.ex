@@ -29,7 +29,7 @@ defmodule GrapevineTelnet.Metrics.ClientInstrumenter do
       [:mssp, :text, :sent],
       [:mssp, :text, :success],
       [:term_type, :sent],
-      [:term_type, :details],
+      [:term_type, :details]
     ]
 
     Enum.each(events, &setup_event/1)
@@ -67,7 +67,13 @@ defmodule GrapevineTelnet.Metrics.ClientInstrumenter do
       name: :telnet_client_count,
       help: "Number of live web clients"
     )
-    :telemetry.attach("grapevine-client-online", [:telnet, :clients, :online], &handle_event/4, nil)
+
+    :telemetry.attach(
+      "grapevine-client-online",
+      [:telnet, :clients, :online],
+      &handle_event/4,
+      nil
+    )
   end
 
   @doc """
@@ -84,9 +90,13 @@ defmodule GrapevineTelnet.Metrics.ClientInstrumenter do
   end
 
   def handle_event([:telnet, :start], _count, %{host: host, port: port}, _config) do
-    Logger.debug(fn ->
-      "Starting Telnet Client: #{host}:#{port}"
-    end, type: :telnet)
+    Logger.debug(
+      fn ->
+        "Starting Telnet Client: #{host}:#{port}"
+      end,
+      type: :telnet
+    )
+
     Counter.inc(name: :telnet_start_total)
   end
 
@@ -96,23 +106,35 @@ defmodule GrapevineTelnet.Metrics.ClientInstrumenter do
   end
 
   def handle_event([:telnet, :connection, :failed], _count, metadata, _config) do
-    Logger.debug(fn ->
-      "Could not connect to a game - #{inspect(metadata[:error])}"
-    end, type: :telnet)
+    Logger.debug(
+      fn ->
+        "Could not connect to a game - #{inspect(metadata[:error])}"
+      end,
+      type: :telnet
+    )
+
     Counter.inc(name: :telnet_connection_failed_total)
   end
 
   def handle_event([:telnet, :wont], _count, metadata, _config) do
-    Logger.debug(fn ->
-      "Rejecting a WONT #{metadata[:byte]}"
-    end, type: :telnet)
+    Logger.debug(
+      fn ->
+        "Rejecting a WONT #{metadata[:byte]}"
+      end,
+      type: :telnet
+    )
+
     Counter.inc(name: :telnet_wont_total)
   end
 
   def handle_event([:telnet, :dont], _count, metadata, _config) do
-    Logger.debug(fn ->
-      "Rejecting a DO #{metadata[:byte]}"
-    end, type: :telnet)
+    Logger.debug(
+      fn ->
+        "Rejecting a DO #{metadata[:byte]}"
+      end,
+      type: :telnet
+    )
+
     Counter.inc(name: :telnet_dont_total)
   end
 

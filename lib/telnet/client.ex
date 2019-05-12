@@ -90,7 +90,7 @@ defmodule GrapevineTelnet.Client do
       buffer: <<>>,
       processed: [],
       features: %Features{},
-      term_type: :grapevine,
+      term_type: :grapevine
     }
 
     state = module.init(state, opts)
@@ -185,7 +185,9 @@ defmodule GrapevineTelnet.Client do
         :ssl.connect(host, state.port, [{:verify, :verify_peer} | opts])
 
       false ->
-        :ssl.connect(host, state.port, [{:verify_fun, {&verify_cert/3, [state.certificate]}} | opts])
+        :ssl.connect(host, state.port, [
+          {:verify_fun, {&verify_cert/3, [state.certificate]}} | opts
+        ])
     end
   end
 
@@ -270,7 +272,11 @@ defmodule GrapevineTelnet.Client do
   defp process_option(state = %{type: "secure telnet"}, option = {:do, :oauth}) do
     socket_send(<<255, 251, 165>>, telemetry: [:oauth, :sent])
     params = %{host: "grapevine.haus"}
-    socket_send(<<255, 250, 165>> <> "Start " <> Jason.encode!(params) <> <<255, 240>>, telemetry: [:oauth, :start])
+
+    socket_send(<<255, 250, 165>> <> "Start " <> Jason.encode!(params) <> <<255, 240>>,
+      telemetry: [:oauth, :start]
+    )
+
     {:noreply, %{state | processed: [option | state.processed]}}
   end
 
@@ -299,7 +305,10 @@ defmodule GrapevineTelnet.Client do
 
     case Enum.member?(charsets, "utf-8") do
       true ->
-        socket_send(<<255, 250, 42, 2>> <> "UTF-8" <> <<255, 240>>, telemetry: [:charset, :accepted])
+        socket_send(<<255, 250, 42, 2>> <> "UTF-8" <> <<255, 240>>,
+          telemetry: [:charset, :accepted]
+        )
+
         {:noreply, state}
 
       _ ->
@@ -325,17 +334,26 @@ defmodule GrapevineTelnet.Client do
 
     case state.term_type do
       :grapevine ->
-        socket_send(start_term_type <> "Grapevine" <> end_term_type, telemetry: [:term_type, :details])
+        socket_send(start_term_type <> "Grapevine" <> end_term_type,
+          telemetry: [:term_type, :details]
+        )
+
         state = %{state | term_type: :ansi}
         {:noreply, state}
 
       :ansi ->
-        socket_send(start_term_type <> "ANSI-256COLOR" <> end_term_type, telemetry: [:term_type, :details])
+        socket_send(start_term_type <> "ANSI-256COLOR" <> end_term_type,
+          telemetry: [:term_type, :details]
+        )
+
         state = %{state | term_type: :mtts}
         {:noreply, state}
 
       :mtts ->
-        socket_send(start_term_type <> "MTTS #{mtts}" <> end_term_type, telemetry: [:term_type, :details])
+        socket_send(start_term_type <> "MTTS #{mtts}" <> end_term_type,
+          telemetry: [:term_type, :details]
+        )
+
         {:noreply, state}
     end
   end

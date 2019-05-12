@@ -21,7 +21,8 @@ defmodule GrapevineTelnet.MSSPTest do
     end
 
     test "multiple values" do
-      options = <<255, 250, 1>> <> "NAME" <> <<2>> <> "ExVenture" <> <<2>> <> "MUD" <> <<255, 240>>
+      options =
+        <<255, 250, 1>> <> "NAME" <> <<2>> <> "ExVenture" <> <<2>> <> "MUD" <> <<255, 240>>
 
       {:ok, values} = MSSP.parse(options)
 
