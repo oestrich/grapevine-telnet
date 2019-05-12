@@ -16,5 +16,5 @@ docker build --build-arg sha=${SHA} --build-arg cookie=${COOKIE} -f Dockerfile.r
 echo -e "\ntravis_fold:end:docker-build\r"
 
 docker run -ti --name telnet_releaser_${DOCKER_UUID} telnet:releaser /bin/true
-docker cp telnet_releaser_${DOCKER_UUID}:/app/_build/prod/rel/grapevine_telnet/releases/1.0.0/grapevine_telnet.tar.gz tmp/
+docker cp telnet_releaser_${DOCKER_UUID}:/app/_build/prod/rel/telnet/releases/1.0.0/telnet.tar.gz tmp/
 docker rm telnet_releaser_${DOCKER_UUID}
