@@ -8,7 +8,7 @@ defmodule GrapevineTelnet.Client do
   require Logger
 
   alias GrapevineTelnet.Features
-  alias GrapevineTelnet.Options
+  alias Telnet.Options
 
   @type message() :: any()
   @type option() :: tuple()
