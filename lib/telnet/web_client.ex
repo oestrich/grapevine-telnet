@@ -9,6 +9,7 @@ defmodule GrapevineTelnet.WebClient do
   alias GrapevineTelnet.ClientSupervisor
   alias GrapevineTelnet.Features
   alias GrapevineTelnet.Presence
+  alias Telnet.NewEnviron
 
   @behaviour Client
 
@@ -60,6 +61,7 @@ defmodule GrapevineTelnet.WebClient do
     |> Map.put(:type, Keyword.get(opts, :type))
     |> Map.put(:host, Keyword.get(opts, :host))
     |> Map.put(:port, Keyword.get(opts, :port))
+    |> Map.put(:client_ip, Keyword.get(opts, :client_ip))
     |> Map.put(:certificate, Keyword.get(opts, :certificate))
     |> Map.put(:channel_pid, channel_pid)
     |> Map.put(:channel_buffer, <<>>)
@@ -142,6 +144,31 @@ defmodule GrapevineTelnet.WebClient do
   def process_option(state, {:oauth, message, data}) do
     maybe_forward(state, :oauth, {message, data})
     {:noreply, state}
+  end
+
+  def process_option(state, {:do, :new_environ}) do
+    case state.settings.new_environ_enabled do
+      true ->
+        will_new_environ = <<255, 251, 39>>
+        Client.socket_send(will_new_environ)
+        {:noreply, state}
+
+      false ->
+        {:noreply, state}
+    end
+  end
+
+  def process_option(state, {:new_environ, :send, ["IPADDRESS"]}) do
+    case state.settings.new_environ_enabled do
+      true ->
+        client_ip = to_string(:inet_parse.ntoa(state.client_ip))
+        response = NewEnviron.encode(:is, [{"IPADDRESS", client_ip}])
+        Client.socket_send(response)
+        {:noreply, state}
+
+      false ->
+        {:noreply, state}
+    end
   end
 
   def process_option(state, _option), do: {:noreply, state}
