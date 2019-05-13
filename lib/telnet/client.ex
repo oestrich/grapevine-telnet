@@ -77,7 +77,7 @@ defmodule GrapevineTelnet.Client do
 
   Note: This uses self()
   """
-  def socket_send(data, opts) do
+  def socket_send(data, opts \\ []) do
     GenServer.cast(self(), {:send, data, opts})
   end
 
@@ -257,6 +257,16 @@ defmodule GrapevineTelnet.Client do
   defp process_option(state, option = {:do, :charset}) do
     socket_send(@will_charset, telemetry: [:charset, :sent])
     {:noreply, %{state | processed: [option | state.processed]}}
+  end
+
+  defp process_option(state, option = {:do, :new_environ}) do
+    state.module.process_option(state, {:do, :new_environ})
+    {:noreply, %{state | processed: [option | state.processed]}}
+  end
+
+  defp process_option(state, {:new_environ, :send, values}) do
+    state.module.process_option(state, {:new_environ, :send, values})
+    {:noreply, state}
   end
 
   defp process_option(state, option = {:do, :line_mode}) do
