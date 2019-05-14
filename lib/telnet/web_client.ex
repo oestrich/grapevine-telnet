@@ -158,8 +158,20 @@ defmodule GrapevineTelnet.WebClient do
     end
   end
 
-  def process_option(state, {:new_environ, :send, ["IPADDRESS"]}) do
+  def process_option(state, {:new_environ, :send, variables}) do
     case state.settings.new_environ_enabled do
+      true ->
+        respond_to_new_environ(state, variables)
+
+      false ->
+        {:noreply, state}
+    end
+  end
+
+  def process_option(state, _option), do: {:noreply, state}
+
+  def respond_to_new_environ(state, variables) do
+    case "IPADDRESS" in variables do
       true ->
         client_ip = to_string(:inet_parse.ntoa(state.client_ip))
         response = NewEnviron.encode(:is, [{"IPADDRESS", client_ip}])
@@ -170,8 +182,6 @@ defmodule GrapevineTelnet.WebClient do
         {:noreply, state}
     end
   end
-
-  def process_option(state, _option), do: {:noreply, state}
 
   @doc """
   Globally process a GMCP message
