@@ -154,6 +154,8 @@ defmodule GrapevineTelnet.WebClient do
         {:noreply, state}
 
       false ->
+        wont_new_environ = <<255, 252, 39>>
+        Client.socket_send(wont_new_environ)
         {:noreply, state}
     end
   end
@@ -179,6 +181,7 @@ defmodule GrapevineTelnet.WebClient do
         {:noreply, state}
 
       false ->
+        Client.socket_send(NewEnviron.encode(:is, []))
         {:noreply, state}
     end
   end
